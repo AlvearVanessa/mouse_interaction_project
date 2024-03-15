@@ -1,0 +1,113 @@
+""""
+AI Virtual Mouse
+Wed, 13/03/24 16:37H CET
+@uthor: maalvear
+Source: https://www.computervision.zone/courses/ai-virtual-mouse/
+"""
+
+import cv2
+import numpy as np
+import HandTrackingModule_black2 as htm
+import time
+import autopy
+
+
+##########################
+wCam, hCam = 1280, 720
+frameR = 80  # Frame Reduction
+smoothening = 7
+#########################
+
+pTime = 0
+plocX, plocY = 0, 0
+clocX, clocY = 0, 0
+
+cap = cv2.VideoCapture(0)
+cap.set(3, wCam)
+cap.set(4, hCam)
+
+detector = htm.handDetector(maxHands=1)
+wScr, hScr = autopy.screen.size()
+#print(wScr, hScr)
+
+
+def showInMovedWindow(winname, imge, x, y):
+    cv2.namedWindow(winname)        # Create a named window
+    cv2.moveWindow(winname, x, y)   # Move it to (x,y)
+    cv2.imshow(winname,imge)
+
+
+while True:
+    # 1. Find hand Landmarks
+    success, img = cap.read()
+
+    if success:
+
+        img = detector.findHands(img)
+        lmList, bbox = detector.findPosition(img)
+        # 2. Get the tip of the index and middle fingers
+        if len(lmList) != 0:
+            x1, y1 = lmList[8][1:]
+            x2, y2 = lmList[12][1:]
+            # print(x1, y1, x2, y2)
+
+        # 3. Check which fingers are up
+        fingers = detector.fingersUp()
+        # print(fingers)
+
+        # print rectangle to resize screen
+        cv2.rectangle(img, (frameR, frameR), (wCam - 11*frameR, hCam - 5*frameR),
+                      (255, 0, 255), 2)
+
+        # 4. Only Index Finger : Moving Mode
+        if fingers[1] == 1 and fingers[2] == 0:
+            # 5. Convert Coordinates
+            x3 = np.interp(x1, (frameR, wCam - 11*frameR), (0, wScr))
+            y3 = np.interp(y1, (frameR, hCam - 5*frameR), (0, hScr+200))
+            # 6. Smoothen Values (to avoid the mouse checking)
+            clocX = plocX + (x3 - plocX) / smoothening
+            clocY = plocY + (y3 - plocY) / smoothening
+            print("Coordinates ", clocX, clocY)
+
+            # 7. Move Mouse
+            autopy.mouse.move(wScr - clocX, clocY)
+            print("Screen dimensions", wScr - clocX, clocY)
+            # scale = autopy.screen.scale()
+            # autopy.mouse.smooth_move(1700 / scale, 0 / scale)
+            # cv2.circle(img, (x1, y1), 15, (255, 0, 255), cv2.FILLED)
+            plocX, plocY = clocX, clocY
+
+        # 8. Both Index and middle fingers are up : Clicking Mode
+        if fingers[1] == 1 and fingers[2] == 1:
+            # 9. Find distance between fingers
+            length, img, lineInfo = detector.findDistance(8, 12, img)
+            # print(length)
+            # 10. Click mouse if distance short
+            if length < 40:
+                cv2.circle(img, (lineInfo[4], lineInfo[5]),
+                           15, (0, 255, 0), cv2.FILLED)
+                autopy.mouse.click()
+                time.sleep(0.75)
+
+        # 11. Frame Rate
+        cTime = time.time()
+        fps = 1 / (cTime - pTime)
+        pTime = cTime
+        cv2.putText(img, str(int(fps)), (20, 50), cv2.FONT_HERSHEY_PLAIN, 3,
+                    (255, 0, 0), 3)
+
+        # scale = autopy.screen.scale()
+        # autopy.mouse.smooth_move(1700 / scale, 0 / scale)
+
+        # 12. Display
+        showInMovedWindow('Image example', img, 0, 610)
+
+        if cv2.waitKey(30) & 0xFF == ord('q'):
+            break
+
+    else:
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+
