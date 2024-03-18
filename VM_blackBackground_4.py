@@ -1,6 +1,6 @@
 """"
 AI Virtual Mouse
-Mon, 18/03/24 16:37H CET
+Mon, 18/03/24 17:07H CET
 @uthor: maalvear
 Source: https://www.computervision.zone/courses/ai-virtual-mouse/
 """
