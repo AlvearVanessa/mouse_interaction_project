@@ -93,12 +93,14 @@ while True:
         print("Clicking mode len 12 and 0 = ", lenght)
         # 10. Click mouse if distance short
         if fingers[1] == 0 and fingers[0] == 1:
-            if 20< lenght < 47:
             # 9. Find distance between fingers
+            lenght, img, lineInfo = detector.findDistance(12, 0, img)
+            print("Clicking mode len lmark 12 and 0 = ", lenght)
+            # 10. Click mouse if distance short
+            if lenght < 50:
                 cv2.circle(img, (lineInfo[4], lineInfo[5]),
                            15, (0, 255, 0), cv2.FILLED)
                 autopy.mouse.click()
-                time.sleep(0.75) # 0.75
 
         # 12. Mouse scrolling bottom up
         if fingers[1] == 1 and fingers[2]==1 :
