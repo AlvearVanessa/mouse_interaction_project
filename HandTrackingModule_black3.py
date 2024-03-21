@@ -47,6 +47,92 @@ class handDetector():
 
                     return annotated_image
 
+
+    def findHands2(self, img, draw=True, flipType=True):
+        """
+        Finds hands in a BGR image.
+        :param img: Image to find the hands in.
+        :param draw: Flag to draw the output on the image.
+        :return: Image with or without drawings
+        """
+        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        self.results = self.hands.process(imgRGB)
+        allHands = []
+        h, w, c = img.shape
+        if self.results.multi_hand_landmarks:
+            for handType, handLms in zip(self.results.multi_handedness, self.results.multi_hand_landmarks):
+                myHand = {}
+                ## lmList
+                mylmList = []
+                xList = []
+                yList = []
+                for id, lm in enumerate(handLms.landmark):
+                    px, py, pz = int(lm.x * w), int(lm.y * h), int(lm.z * w)
+                    mylmList.append([px, py, pz])
+                    xList.append(px)
+                    yList.append(py)
+
+                ## bbox
+                xmin, xmax = min(xList), max(xList)
+                ymin, ymax = min(yList), max(yList)
+                boxW, boxH = xmax - xmin, ymax - ymin
+                bbox = xmin, ymin, boxW, boxH
+                cx, cy = bbox[0] + (bbox[2] // 2), \
+                         bbox[1] + (bbox[3] // 2)
+
+                myHand["lmList"] = mylmList
+                myHand["bbox"] = bbox
+                myHand["center"] = (cx, cy)
+
+                if flipType:
+                    if handType.classification[0].label == "Right":
+                        myHand["type"] = "Left"
+                    else:
+                        myHand["type"] = "Right"
+                else:
+                    myHand["type"] = handType.classification[0].label
+                allHands.append(myHand)
+
+                ## draw
+                if draw:
+                    self.mpDraw.draw_landmarks(img, handLms,
+                                               self.mpHands.HAND_CONNECTIONS)
+                    cv2.rectangle(img, (bbox[0] - 20, bbox[1] - 20),
+                                  (bbox[0] + bbox[2] + 20, bbox[1] + bbox[3] + 20),
+                                  (255, 0, 255), 2)
+                    cv2.putText(img, myHand["type"], (bbox[0] - 30, bbox[1] - 30), cv2.FONT_HERSHEY_PLAIN,
+                                2, (255, 0, 255), 2)
+
+        return allHands, img
+
+    def findHandsLandmarks(self, img, draw=True):
+        """
+        Finds face landmarks in BGR Image.
+        :param img: Image to find the face landmarks in.
+        :param draw: Flag to draw the output on the image.
+        :return: Image with or without drawings
+        """
+        self.imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        self.results = self.hands.process(self.imgRGB)
+        # print(results.multi_hand_landmarks)
+        hands = []
+        h, w, c = img.shape
+        # results1 = hand_mesh.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        if self.results.multi_hand_landmarks:
+            for handLms in self.results.multi_hand_landmarks:
+                if draw:
+                    # black = np.zeros((350, 500, 3), dtype=np.uint8)
+                    # annotated_image = black
+                    self.mpDraw.draw_landmarks(img, handLms,
+                                               self.mpHands.HAND_CONNECTIONS)
+                hand = []
+                for id, lm in enumerate(handLms.landmark):
+                    ih, iw, ic = img.shape
+                    x, y = int(lm.x * iw), int(lm.y * ih)
+                    hand.append([x, y])
+                hands.append(hand)
+        return img, hands
+
     def findPosition(self, img, handNo=0, draw=True):
         xList = []
         yList = []

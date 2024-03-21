@@ -114,16 +114,28 @@ while True:
                 mouse.wheel(delta=1)
 
 
-        # 12. Mouse scrolling bottom DOWN
+        # 15. Mouse scrolling bottom DOWN
         if fingers[1] == 0 and fingers[2]==0 :
-            # 13. Find distance between fingers
+            # 16. Find distance between fingers
             lenght3, img, lineInfo3 = detector.findDistance(8, 12, img)
             #print("Mouse scrolling UP len 8 and 12 = ", lenght2)
-            # 14. Clock mouse if distance short
+            # 17. Clock mouse if distance short
             if lenght3 < threshold_scroll_down:
                 cv2.circle(img, (lineInfo3[4], lineInfo3[5]),
                            15, (255, 0, 0), cv2.FILLED)
                 mouse.wheel(delta=-1)
+
+        # 18. Mouse Zoom-in
+        #if fingers[1] == 0 and fingers[2]==0 :
+            # 16. Find distance between fingers
+            #lenght3, img, lineInfo3 = detector.findDistance(8, 12, img)
+            #print("Mouse scrolling UP len 8 and 12 = ", lenght2)
+            # 17. Clock mouse if distance short
+            #if lenght3 < threshold_scroll_down:
+                #cv2.circle(img, (lineInfo3[4], lineInfo3[5]),
+                           #15, (255, 0, 0), cv2.FILLED)
+                #autopy.mouse.
+
 
 
 
