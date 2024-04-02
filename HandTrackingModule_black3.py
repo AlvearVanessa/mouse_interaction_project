@@ -154,7 +154,11 @@ class handDetector():
 
             xmin, xmax = min(xList), max(xList)
             ymin, ymax = min(yList), max(yList)
-            bbox = xmin, ymin, xmax, ymax
+            # bbox = xmin, ymin, xmax, ymax
+            bbox.append(xmin)
+            bbox.append(ymin)
+            bbox.append(xmax)
+            bbox.append(ymax)
 
             if draw:
                 cv2.rectangle(img, (xmin - 20, ymin - 20), (xmax + 20, ymax + 20),
@@ -220,6 +224,7 @@ def main():
         if success==True:
             img = detector.findHands(img)
             lmList, bbox = detector.findPosition(img)
+            print(bbox)
             if len(lmList) != 0:
                 print(lmList[4])
 

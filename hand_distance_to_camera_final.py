@@ -64,7 +64,45 @@ while True:
     hands = detector.findHands2(img, draw=False)
 
     if hands:
-        lmList = hands[0]
-        print(lmList)
+
+        #lmList = hands[0]
+        # Dimensions of the bbox
+        #lmList, bbox= detector.findPosition(img)
+        #print(find_hand_position)
+        #print(bbox)
+        # List of x and y landmarks positions for all the 21 points
+        #lm_list = hands[0]
+        lm_list, bbox = detector.findPosition(img)
+        x, y, w, h = bbox
+        #print(lm_list[5][1:])
+        # x and y position for landmk 5 and 17
+        x1, y1 = lm_list[5][1:]
+        x2, y2 = lm_list[17][1:]
+        # find distance between landmks 5 and 17 as a hypotenuse
+        # Solving the rotation problem of the distance
+        distance = int(math.sqrt((abs(x2-x1))**2 + (abs(y2-y1))**2))
+        A, B, C = coff
+        distanceCM = A*distance**2 + B*distance + C
+        # print(distanceCM, distance)
+
+        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 255), 3)
+        putTextRect(img, f'{int(distanceCM)} cm', (x+5, y-10))
+
     cv2.imshow("Image", img)
     cv2.waitKey(1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

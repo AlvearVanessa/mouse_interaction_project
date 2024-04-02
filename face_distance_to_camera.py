@@ -68,7 +68,7 @@ while True:
         d = (W * f) / w
         print(d)
 
-        putTextRect(img, f'Depth: {int(d)}cm',
+        putTextRect(img, f'Depth: {int(d)-22}cm',
                            (face[10][0] - 100, face[10][1] - 50),
                            scale=2)
 
