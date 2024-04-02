@@ -90,7 +90,7 @@ while True:
 
         # 8. Check if we are in clicking mode: Both index and middle fingers are up: Clicking Mode
         lenght, img, lineInfo = detector.findDistance(12, 0, img)
-        print("Clicking mode len 12 and 0 = ", lenght)
+        #print("Clicking mode len 12 and 0 = ", lenght)
         # 10. Click mouse if distance short
         if fingers[1] == 0 and fingers[0] == 1:
             if 20< lenght < 47:
@@ -104,7 +104,7 @@ while True:
         if fingers[1] == 1 and fingers[2]==1 :
             # 13. Find distance between fingers
             lenght2, img, lineInfo2 = detector.findDistance(8, 12, img)
-            print("Mouse scrolling UP len 8 and 12 = ", lenght2)
+            #print("Mouse scrolling UP len 8 and 12 = ", lenght2)
             # 14. Clock mouse if distance short
             if lenght2 < threshold_scroll_up:
                 cv2.circle(img, (lineInfo2[4], lineInfo2[5]),

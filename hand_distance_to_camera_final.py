@@ -4,7 +4,7 @@ Hand landmarks Module
 Source: https://www.computervision.zone/
 """
 import cv2
-import HandTrackingModule_black3 as htm
+import HandTrackingModule_black_camera_hand_distance as htm
 from HandTrackingModule_black3 import handDetector
 import math
 import numpy as np
@@ -85,7 +85,7 @@ while True:
         distanceCM = A*distance**2 + B*distance + C
         # print(distanceCM, distance)
 
-        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 255), 3)
+        cv2.rectangle(img, (x, y), (w+10, h+10), (255, 0, 255), 3)
         putTextRect(img, f'{int(distanceCM)} cm', (x+5, y-10))
 
     cv2.imshow("Image", img)
